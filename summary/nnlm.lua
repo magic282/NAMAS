@@ -13,7 +13,7 @@
 -- Ngram neural language model with auxiliary model
 require('nn')
 require('nngraph')
-require('fbnn')
+--require('fbnn')
 require('cunn')
 require('sys')
 local utils = require('summary.util')
