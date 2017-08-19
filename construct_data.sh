@@ -3,7 +3,7 @@
 export STANFORD_NLP_HOME=D:/users/v-qizhou/Projects/stanford-corenlp-full-2016-10-31
 export GIGAHOME=D:/users/v-qizhou/Data/LDC2011T07_EngGigaword5th/Data/LDC2011T07_Original
 export OUTDIR=D:/users/v-qizhou/Data/LDC2011T07_EngGigaword5th/Data/LDC2011T07_Original/extracted
-export FINAL_OUTPUTDIR=D:/users/v-qizhou/Data/LDC2011T07_EngGigaword5th/Data/LDC2011T07_Original/processed
+export FINAL_OUTPUTDIR=D:/users/v-qizhou/Data/LDC2011T07_EngGigaword5th/Data/LDC2011T07_Original/processed_2
 export SCRIPTHOME=D:/users/v-qizhou/Projects/NAMAS/dataset
 export THREADS=10
 

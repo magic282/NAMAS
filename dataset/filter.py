@@ -11,12 +11,28 @@
 #          Jason Weston <jase@fb.com>
 
 import sys
+import re
+try:
+    import ipdb
+except ImportError:
+    pass
 #@lint-avoid-python-3-compatibility-imports
 
 article_out = open(sys.argv[1] + '.filter', 'w', encoding='utf-8')
 title_out = open(sys.argv[2] + '.filter', 'w', encoding='utf-8')
 
 dedup = set()
+bad_words = ['update#', 'update', 'recasts', 'undated', 'grafs', 'corrects',
+                     'retransmitting', 'updates', 'dateline', 'writethru',
+                     'recaps', 'inserts', 'incorporates', 'adv##',
+                     'ld-writethru', 'djlfx', 'edits', 'byline',
+                     'repetition', 'background', 'thruout', 'quotes',
+                     'attention', 'ny###', 'overline', 'embargoed', 'ap', 'gmt',
+                     'adds', 'embargo',
+                     'urgent', '?', ' i ', ' : ', ' - ', ' by ', '-lrb-', '-rrb-']
+puncts = ['"', "'", "''", "!", "=", "-",
+                              "--", ",", "?", ".",
+                              "``", "`", "-lrb-", "-rrb-", "/"]
 
 with open(sys.argv[1], encoding='utf-8') as article_in, open(sys.argv[2], encoding='utf-8') as title_in:
     for article, title in zip(article_in, title_in):
@@ -24,7 +40,7 @@ with open(sys.argv[1], encoding='utf-8') as article_in, open(sys.argv[2], encodi
         title = title.strip()
         title_words = title.split()
         article_words = article.split()
-    
+        
         # No blanks.
         if any((word == "" for word in title_words)):
             continue
@@ -38,15 +54,7 @@ with open(sys.argv[1], encoding='utf-8') as article_in, open(sys.argv[2], encodi
         # Spurious words to blacklist.
         # First set is words that never appear in input and output
         # Second set is punctuation and non-title words.
-        bad_words = ['update#', 'update', 'recasts', 'undated', 'grafs', 'corrects',
-                     'retransmitting', 'updates', 'dateline', 'writethru',
-                     'recaps', 'inserts', 'incorporates', 'adv##',
-                     'ld-writethru', 'djlfx', 'edits', 'byline',
-                     'repetition', 'background', 'thruout', 'quotes',
-                     'attention', 'ny###', 'overline', 'embargoed', 'ap', 'gmt',
-                     'adds', 'embargo',
-                     'urgent', '?', ' i ', ' : ', ' - ', ' by ', '-lrb-', '-rrb-']
-        if any((bad in title.lower()
+        if any((bad in re.sub(r'\d', '#', title.lower())
                 for bad in bad_words)):
             continue
     
@@ -54,13 +62,17 @@ with open(sys.argv[1], encoding='utf-8') as article_in, open(sys.argv[2], encodi
         if not (10 < len(article_words) < 100 and
                 3 < len(title_words) < 50):
             continue
-    
+        
         # Some word match.
         matches = len(set([w.lower() for w in title_words if len(w) > 3]) &
                       set([w.lower() for w in article_words if len(w) > 3]))
         if matches < 1:
             continue
-        k = article + ' ' + title
+        
+        new_title = [x for x in title_words if x.lower() not in puncts]
+        title = " ".join(new_title)
+        k = article + '\t' + title
+        
         if k in dedup:
             continue
         # Okay, save it.
